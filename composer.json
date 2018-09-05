@@ -1,0 +1,30 @@
+{
+  "config": {
+    "sort-packages": true
+  },
+  "name": "pe/symfony-bundle-grid",
+  "description": "Symfony integration of pe/component-grid",
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eugene Pavlenko",
+      "email": "pavlenko.obs@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^5.5.9|>=7.0.8",
+    "pe/component-grid": "^1.0@dev",
+    "symfony/framework-bundle": "~3.4|~4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "PE\\Bundle\\GridBundle\\": ""
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
+  }
+}

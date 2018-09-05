@@ -1,0 +1,161 @@
+{# GRID #}
+{%- block grid -%}
+    <table {{ block('grid_attributes') }}>
+        <thead>
+        {{- grid_header_row(grid) -}}
+        </thead>
+        <tfoot>
+        {{- grid_footer_row(grid) -}}
+        </tfoot>
+        <tbody>
+        {% for row in grid.rows %}
+            {{- grid_body_row(row) -}}
+        {% endfor %}
+        </tbody>
+    </table>
+{%- endblock grid -%}
+
+{# ROWS #}
+{%- block grid_header_row -%}
+    <tr>
+        {%- for column in grid.columns -%}
+            {{- grid_header_column(column) -}}
+        {%- endfor -%}
+    </tr>
+{%- endblock grid_header_row -%}
+
+{%- block grid_footer_row -%}
+    {%- set batch_column = null -%}
+    {%- for column in grid.columns if not batch_column and column.vars.type == 'batch' -%}
+        {%- set batch_column = column -%}
+    {%- endfor -%}
+    {%- if batch_column -%}
+        <tr>
+            <td colspan="{{ grid.columns|length }}">
+                {{ 'Do with selected' }}
+                {%- for actionName, actionOptions in batch_column.vars.actions -%}
+                    {{ block('action') }}
+                {%- endfor -%}
+            </td>
+        </tr>
+    {%- endif -%}
+{%- endblock -%}
+
+{%- block grid_body_row -%}
+    <tr {{ block('grid_attributes') }}>
+        {%- for cell in row.cells -%}
+            {{- grid_body_cell(cell) -}}
+        {%- endfor -%}
+    </tr>
+{%- endblock -%}
+
+{# HEADER CELLS #}
+{%- block grid_header_column -%}
+    <th {{ block('grid_attributes') }}>
+        {{ grid_header_column_widget(column) }}
+    </th>
+{%- endblock -%}
+
+{# BODY CELLS #}
+{%- block grid_body_cell -%}
+    <td {{ block('grid_attributes') }}>
+        {{ grid_body_cell_widget(cell) }}
+    </td>
+{%- endblock -%}
+
+{# WIDGETS #}
+{%- block grid_header_column_widget -%}
+    {%- if label is not same as(false) -%}
+        {% if label is empty -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+        {{- translation_domain is same as(false) ? label : label|trans({}, translation_domain) -}}
+    {%- endif -%}
+{%- endblock -%}
+
+{%- block grid_body_cell_widget -%}
+    {{ value }}
+{%- endblock -%}
+
+{%- block actions_body_cell_widget -%}
+    <nobr>
+        {%- for actionName, actionOptions in actions -%}
+            {{ block('action') }}
+        {%- endfor -%}
+    </nobr>
+{%- endblock -%}
+
+{%- block batch_header_column_widget -%}
+    {% set attr = attr|default([])|merge({title: 'Select all'}) %}
+    {{ block('batch_input') }}
+{%- endblock -%}
+
+{%- block batch_body_cell_widget -%}
+    {% set attr = attr|default([])|merge({title: 'Select row'}) %}
+    {{ block('batch_input') }}
+{%- endblock -%}
+
+{%- block boolean_body_cell_widget -%}
+    {%- if active -%}
+        {#TODO on change - trigger action#}
+        <input type="checkbox" {% if value %}checked{% endif %} onchange="alert(this.checked)">
+    {%- else -%}
+        {{ value ? label_true : label_false }}
+    {%- endif -%}
+{%- endblock -%}
+
+{%- block status_body_cell_widget -%}
+    <select {% if multiple %}multiple{% endif %} onchange="alert(this.value)">
+        {%- for choiceKey, choiceLabel in choices -%}
+            <option value="{{ choiceKey }}" {%- if multiple and choiceKey in value or choiceKey == value -%}selected{% endif %}>
+                {{- choiceLabel -}}
+            </option>
+        {%- endfor -%}
+    </select>
+{%- endblock -%}
+
+{%- block choices_body_cell_widget -%}
+    {%- if multiple -%}
+        {%- set selected = [] -%}
+        {%- for choiceKey, choiceLabel in choices -%}
+            {%- if choiceKey in value -%}
+                {%- set selected = selected|merge(choiceLabel) -%}
+            {%- endif -%}
+        {%- endfor -%}
+        {{- selected|join(', ') -}}
+    {%- else -%}
+        {{- choices[value] ?? '-' -}}{#TODO default value if not in list#}
+    {%- endif -%}
+{%- endblock -%}
+
+{# HELPERS #}
+{%- block grid_attributes -%}
+    {% if attr is defined %}
+        {%- for attrname, attrvalue in attr -%}
+            {{- " " -}}
+            {%- if attrvalue is same as(true) -%}
+                {{- attrname }}="{{ attrname }}"
+            {%- elseif attrvalue is not same as(false) -%}
+                {{- attrname }}="{{ attrvalue }}"
+            {%- endif -%}
+        {%- endfor -%}
+    {% endif %}
+{%- endblock -%}
+
+{% block batch_input %}
+    <input type="checkbox" id="{{ id }}" name="{{ name }}" {{ block('grid_attributes') }}>
+{% endblock %}
+
+{%- block action -%}
+    {%- set label = actionOptions.label -%}
+    {%- if label is empty -%}
+        {%- set label = actionName|humanize -%}
+    {%- endif -%}
+    {%- set label = translation_domain is same as(false) ? label : label|trans({}, translation_domain) -%}
+    {%- set attr = actionOptions.attr -%}
+    {%- if 'a' == actionOptions.tag|lower -%}
+        <a href="{{ actionOptions.url }}" {{ block('grid_attributes') }}>{{- label -}}</a>
+    {%- else -%}
+        <button data-url="{{ actionOptions.url }}" {{ block('grid_attributes') }}>{{- label -}}</button>
+    {%- endif -%}
+{%- endblock -%}

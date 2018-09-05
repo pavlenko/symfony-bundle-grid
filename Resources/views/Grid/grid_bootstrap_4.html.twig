@@ -1,0 +1,74 @@
+{% extends '@PEGrid/Grid/grid_default.html.twig' %}
+
+{# GRID #}
+{% block grid %}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' table')|trim}) -%}
+    {{- parent() -}}
+{% endblock %}
+
+{# HEADER CELLS #}
+{%- block batch_header_column -%}
+    <th {{ block('grid_attributes') }}>
+        <div class="custom-control custom-checkbox">
+            {{ grid_header_column_widget(column) }}
+            <label for="{{ id }}" class="custom-control-label"></label>
+        </div>
+    </th>
+{%- endblock -%}
+
+{# BODY CELLS #}
+{%- block batch_body_cell -%}
+    <td {{ block('grid_attributes') }}>
+        <div class="custom-control custom-checkbox">
+            {{ grid_body_cell_widget(cell) }}
+            <label for="{{ id }}" class="custom-control-label"></label>
+        </div>
+    </td>
+{%- endblock -%}
+
+{# WIDGETS #}
+{%- block batch_header_column_widget -%}
+    {% set attr = attr|default([])|merge({class: 'custom-control-input'}) %}
+    {{ parent() }}
+{%- endblock -%}
+
+{%- block batch_body_cell_widget -%}
+    {% set attr = attr|default([])|merge({class: 'custom-control-input'}) %}
+    {{ parent() }}
+{%- endblock -%}
+
+{%- block boolean_body_cell_widget -%}
+    {% if active %}
+        {#TODO on change - trigger action#}
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" id="{{ id }}" class="custom-control-input" {% if value %}checked{% endif %} onchange="alert(this.checked)">
+            <label for="{{ id }}" class="custom-control-label"></label>
+        </div>
+    {% else %}
+        {{ value ? label_true : label_false }}
+    {% endif %}
+{%- endblock -%}
+
+{%- block status_body_cell_widget -%}
+    <select class="form-control form-control-sm" {% if multiple %}multiple{% endif %} onchange="alert(this.value)">
+        {%- for choiceKey, choiceLabel in choices -%}
+            <option value="{{ choiceKey }}" {%- if multiple and choiceKey in value or choiceKey == value -%}selected{% endif %}>
+                {{- choiceLabel -}}
+            </option>
+        {%- endfor -%}
+    </select>
+{%- endblock -%}
+
+{%- block choices_body_cell_widget -%}
+    {%- if multiple -%}
+        {%- set selected = [] -%}
+        {%- for choiceKey, choiceLabel in choices -%}
+            {%- if choiceKey in value -%}
+                {%- set selected = selected|merge(choiceLabel) -%}
+            {%- endif -%}
+        {%- endfor -%}
+        {{- selected|join(', ') -}}
+    {%- else -%}
+        {{- choices[value] ?? '-' -}}{#TODO default value if not in list#}
+    {%- endif -%}
+{%- endblock -%}

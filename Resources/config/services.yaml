@@ -1,0 +1,56 @@
+services:
+    pe_grid.registry:
+        class: PE\Component\Grid\Registry
+        arguments: [[], []]
+
+    pe_grid.factory:
+        public: true
+        class: PE\Component\Grid\GridFactory
+        arguments:
+            - '@pe_grid.registry'
+
+    pe_grid.grid_extension.container:
+        class: PE\Component\Grid\GridExtension\ContainerExtension
+        arguments: [~, []]
+        tags:
+            - { name: pe_grid.grid_extension }
+
+    pe_grid.grid_type.grid:
+        class: PE\Component\Grid\GridType\BaseGridType
+        tags:
+            - { name: pe_grid.grid_type }
+
+    pe_grid.column_extension.container:
+        class: PE\Component\Grid\ColumnExtension\ContainerExtension
+        arguments: [~, []]
+        tags:
+            - { name: pe_grid.column_extension }
+
+    pe_grid.column_type_extension.actions:
+        class: PE\Bundle\GridBundle\Grid\ColumnTypeExtension\ActionsColumnTypeExtension
+        arguments:
+            - '@router'
+        tags:
+            - { name: pe_grid.column_type_extension }
+
+    pe_grid.column_type_extension.batch:
+        class: PE\Bundle\GridBundle\Grid\ColumnTypeExtension\BatchColumnTypeExtension
+        tags:
+            - { name: pe_grid.column_type_extension }
+
+    pe_grid.twig_extension:
+        class: PE\Bundle\GridBundle\Twig\GridExtension
+        tags:
+            - { name: twig.extension }
+
+    pe_grid.renderer:
+        class: PE\Bundle\GridBundle\Twig\GridRenderer
+        arguments:
+            - '@twig'
+        tags:
+            - { name: twig.runtime }
+
+#    pe_grid.data_collector:
+#        class: PE\Bundle\GridBundle\DataCollector\GridDataCollector
+#        tags:
+#            - { name: data_collector, template: 'PEGridBundle:Collector:grid.html.twig', id: pe_grid }

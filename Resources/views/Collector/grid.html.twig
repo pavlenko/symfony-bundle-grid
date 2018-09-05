@@ -1,0 +1,27 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        {{ include('@PEGrid/Icon/grid.svg') }}
+        <span class="sf-toolbar-value sf-toolbar-ajax-request-counter">0</span>
+    {% endset %}
+
+    {#TODO#}
+    {#{% set text %}
+        #}{# this is the content displayed when hovering the mouse over
+           the toolbar panel #}{#
+        <div class="sf-toolbar-info-piece">
+            <b>Method</b>
+            <span>{{ collector.method }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Accepted content type</b>
+            <span>{{ collector.acceptableContentTypes|join(', ') }}</span>
+        </div>
+    {% endset %}#}
+
+    {# the 'link' value set to 'false' means that this panel doesn't
+       show a section in the web profiler #}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
+{% endblock %}

@@ -1,4 +1,4 @@
-# OAuth server symfony bundle
+# Data grid symfony bundle
 This bundle integrates with pe/component-grid.
 
 ## Installation
